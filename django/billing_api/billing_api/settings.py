@@ -15,7 +15,7 @@ INSTALLED_APPS = [
   'django.contrib.admin','django.contrib.auth','django.contrib.contenttypes',
   'django.contrib.sessions','django.contrib.messages','django.contrib.staticfiles',
   'rest_framework','django_filters',
-  'users','catalog',
+  'users','catalog','invoices',
 ]
 
 MIDDLEWARE = [
@@ -34,7 +34,7 @@ ROOT_URLCONF = 'billing_api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
