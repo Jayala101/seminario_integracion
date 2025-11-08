@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #111; }
+    h1 { font-size: 18px; margin-bottom: 4px; }
+    .muted { color: #555; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+    th { background: #f2f2f2; }
+    .totals { margin-top: 12px; float: right; width: 40%; }
+    .right { text-align: right; }
+    .badge { padding: 4px 8px; border-radius: 6px; background: #eee; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <h1>Factura {{ invoice.number|default:invoice.id }}</h1>
+  <div class="muted">Estado: <span class="badge">{{ invoice.status }}</span></div>
+  <p>
+    Cliente: <strong>{{ invoice.customer_name }}</strong><br/>
+    Email: {{ invoice.customer_email|default:"-" }}<br/>
+    Fecha: {{ invoice.created_at|date:"d/m/Y H:i" }}
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th class="right">Precio</th>
+        <th class="right">Cantidad</th>
+        <th class="right">Subtotal</th>
+        <th class="right">Impuesto</th>
+        <th class="right">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in details %}
+      <tr>
+        <td>{{ d.product.name }}</td>
+        <td class="right">{{ d.unit_price }}</td>
+        <td class="right">{{ d.quantity }}</td>
+        <td class="right">{{ d.line_subtotal }}</td>
+        <td class="right">{{ d.line_tax }}</td>
+        <td class="right">{{ d.line_total }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">Sin items</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="totals">
+    <tr><td>Subtotal:</td><td class="right">{{ invoice.subtotal }}</td></tr>
+    <tr><td>Impuesto:</td><td class="right">{{ invoice.tax }}</td></tr>
+    <tr><td><strong>Total:</strong></td><td class="right"><strong>{{ invoice.total }}</strong></td></tr>
+  </table>
+</body>
+</html>
