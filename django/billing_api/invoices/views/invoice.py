@@ -10,6 +10,11 @@ from invoices.serializers.invoice import InvoiceSerializer, InvoiceCreateSeriali
 from invoices.serializers.detail import InvoiceDetailSerializer
 from invoices.services.totals import recompute_invoice
 from catalog.models import Product
+<<<<<<< HEAD
+=======
+from invoices.services.pdf import render_pdf_from_template
+from invoices.models import InvoiceDetail
+>>>>>>> ab7a16d92c366da0755c358a0b4f9e64d59831d1
 
 class IsOwnerOrStaff(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -99,3 +104,13 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         invoice.save(update_fields=['status'])
         recompute_invoice(invoice)
         return Response(InvoiceSerializer(invoice).data, status=200)
+<<<<<<< HEAD
+=======
+
+    @action(detail=True, methods=['get'])
+    def pdf(self, request, pk=None):
+        invoice = self.get_object()
+        details = InvoiceDetail.objects.filter(invoice=invoice).select_related('product')
+        ctx = { 'invoice': invoice, 'details': details }
+        return render_pdf_from_template('invoices/invoice_pdf.html', ctx, f'invoice-{invoice.pk}.pdf')
+>>>>>>> ab7a16d92c366da0755c358a0b4f9e64d59831d1
