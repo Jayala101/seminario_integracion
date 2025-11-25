@@ -1,0 +1,1315 @@
+{
+	"info": {
+		"_postman_id": "flights-api-collection-2025",
+		"name": "Flights API",
+		"description": "Colección completa para la API de Gestión de Vuelos de Aeropuerto",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"usuario_demo\",\n    \"email\": \"demo@example.com\",\n    \"password\": \"Password123!\",\n    \"password2\": \"Password123!\",\n    \"first_name\": \"Juan\",\n    \"last_name\": \"Pérez\",\n    \"profile\": {\n        \"phone\": \"+52 55 1234 5678\",\n        \"date_of_birth\": \"1990-05-15\",\n        \"nationality\": \"Mexicana\",\n        \"document_type\": \"PASSPORT\",\n        \"document_number\": \"M12345678\",\n        \"city\": \"Ciudad de México\",\n        \"country\": \"México\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/register/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.tokens && jsonData.tokens.access) {",
+									"    pm.environment.set(\"access_token\", jsonData.tokens.access);",
+									"    pm.environment.set(\"refresh_token\", jsonData.tokens.refresh);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"usuario_demo\",\n    \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/login/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access) {",
+									"    pm.environment.set(\"access_token\", jsonData.access);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/token/refresh/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"token",
+								"refresh",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users/me/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Juan Carlos\",\n    \"profile\": {\n        \"phone\": \"+52 55 9876 5432\",\n        \"preferred_seat\": \"WINDOW\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/update_profile/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"update_profile",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"old_password\": \"Password123!\",\n    \"new_password\": \"NewPassword123!\",\n    \"new_password2\": \"NewPassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/change_password/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"change_password",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Airlines",
+			"item": [
+				{
+					"name": "List Airlines",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/airlines/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"airlines",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Airline",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"AM\",\n    \"name\": \"Aeroméxico\",\n    \"country\": \"México\",\n    \"website\": \"https://www.aeromexico.com\",\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/catalog/airlines/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"airlines",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airline Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/airlines/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"airlines",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Airline",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"AM\",\n    \"name\": \"Aeroméxico\",\n    \"country\": \"México\",\n    \"website\": \"https://www.aeromexico.com\",\n    \"logo_url\": \"https://example.com/logo.png\",\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/catalog/airlines/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"airlines",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airline Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/airlines/1/flights/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"airlines",
+								"1",
+								"flights",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Airlines by Country",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/airlines/?country=México",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"airlines",
+								""
+							],
+							"query": [
+								{
+									"key": "country",
+									"value": "México"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Airline",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/airlines/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"airlines",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Airports",
+			"item": [
+				{
+					"name": "List Airports",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Airport",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"MEX\",\n    \"name\": \"Aeropuerto Internacional de la Ciudad de México\",\n    \"city\": \"Ciudad de México\",\n    \"country\": \"México\",\n    \"timezone\": \"America/Mexico_City\",\n    \"latitude\": 19.4363,\n    \"longitude\": -99.0721,\n    \"elevation\": 2230,\n    \"is_international\": true,\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/airports/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airport Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airport Departures",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports/1/departures/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								"1",
+								"departures",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airport Arrivals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports/1/arrivals/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								"1",
+								"arrivals",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get International Airports",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports/international/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								"international",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Airports by Country",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports/search_by_country/?country=México",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								"search_by_country",
+								""
+							],
+							"query": [
+								{
+									"key": "country",
+									"value": "México"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Airports by City",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/airports/?city=Ciudad de México",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								""
+							],
+							"query": [
+								{
+									"key": "city",
+									"value": "Ciudad de México"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Airport",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"website\": \"https://www.aicm.com.mx\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/airports/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"airports",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Flights",
+			"item": [
+				{
+					"name": "List Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/flights/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"flights",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Flight",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"airline_id\": 1,\n    \"flight_number\": \"100\",\n    \"origin_airport\": 1,\n    \"destination_airport\": 2,\n    \"departure_time\": \"2025-12-01T08:00:00Z\",\n    \"arrival_time\": \"2025-12-01T14:30:00Z\",\n    \"base_price\": \"299.99\",\n    \"available_seats\": 150,\n    \"total_seats\": 180,\n    \"flight_class\": \"ECONOMY\",\n    \"status\": \"SCHEDULED\",\n    \"aircraft_type\": \"Boeing 737-800\",\n    \"gate\": \"A12\",\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/catalog/flights/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"flights",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Flight Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/flights/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"flights",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/flights/search_flights/?origin=MEX&destination=JFK&date=2025-12-01&class=ECONOMY",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"flights",
+								"search_flights",
+								""
+							],
+							"query": [
+								{
+									"key": "origin",
+									"value": "MEX"
+								},
+								{
+									"key": "destination",
+									"value": "JFK"
+								},
+								{
+									"key": "date",
+									"value": "2025-12-01"
+								},
+								{
+									"key": "class",
+									"value": "ECONOMY"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Upcoming Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/flights/upcoming/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"flights",
+								"upcoming",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Flight Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"BOARDING\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/catalog/flights/1/update_status/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"flights",
+								"1",
+								"update_status",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Flight Availability",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/flights/1/availability/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"flights",
+								"1",
+								"availability",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter Flights by Airline",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/flights/?airline=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"flights",
+								""
+							],
+							"query": [
+								{
+									"key": "airline",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter Flights by Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/catalog/flights/?status=SCHEDULED",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"flights",
+								""
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "SCHEDULED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Flight",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"gate\": \"B15\",\n    \"available_seats\": 145\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/catalog/flights/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"flights",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "List My Bookings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/bookings/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"passenger_name\": \"Juan Pérez García\",\n    \"passenger_email\": \"juan.perez@example.com\",\n    \"passenger_phone\": \"+52 55 1234 5678\",\n    \"passenger_document\": \"M12345678\",\n    \"passengers\": [\n        {\n            \"flight\": 1,\n            \"passenger_name\": \"Juan Pérez García\",\n            \"passenger_document\": \"M12345678\",\n            \"passenger_age\": 35,\n            \"passenger_type\": \"ADULT\",\n            \"seat_number\": \"12A\",\n            \"checked_bags\": 1,\n            \"carry_on_bags\": 1,\n            \"base_price\": \"299.99\",\n            \"baggage_fee\": \"25.00\"\n        },\n        {\n            \"flight\": 1,\n            \"passenger_name\": \"María Pérez López\",\n            \"passenger_document\": \"M87654321\",\n            \"passenger_age\": 32,\n            \"passenger_type\": \"ADULT\",\n            \"seat_number\": \"12B\",\n            \"checked_bags\": 1,\n            \"carry_on_bags\": 1,\n            \"base_price\": \"299.99\",\n            \"baggage_fee\": \"25.00\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bookings/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/bookings/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/bookings/1/confirm/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"1",
+								"confirm",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/bookings/1/cancel/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"1",
+								"cancel",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Bookings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/bookings/my_bookings/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"my_bookings",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Upcoming Bookings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/bookings/upcoming/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"upcoming",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Passenger to Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"flight\": 1,\n    \"passenger_name\": \"Carlos Pérez López\",\n    \"passenger_document\": \"M11122233\",\n    \"passenger_age\": 8,\n    \"passenger_type\": \"CHILD\",\n    \"seat_number\": \"12C\",\n    \"checked_bags\": 0,\n    \"carry_on_bags\": 1,\n    \"base_price\": \"199.99\",\n    \"baggage_fee\": \"0.00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bookings/1/add_passenger/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"1",
+								"add_passenger",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter Bookings by Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/bookings/?status=CONFIRMED",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								""
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "CONFIRMED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Booking",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"passenger_phone\": \"+52 55 9999 8888\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bookings/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Get My Bookings History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users/bookings/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"bookings",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Users (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
