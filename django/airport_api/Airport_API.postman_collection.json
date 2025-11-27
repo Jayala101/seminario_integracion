@@ -1,0 +1,1182 @@
+{
+	"info": {
+		"_postman_id": "airport-api-collection-2024",
+		"name": "Airport Management API",
+		"description": "API completa para gestión de aeropuertos con autenticación Token y JWT",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "jwt_access",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "jwt_refresh",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Token - Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('token', jsonData.token);",
+									"    pm.environment.set('token', jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/token/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "token", ""]
+						},
+						"description": "Obtener token de autenticación"
+					},
+					"response": []
+				},
+				{
+					"name": "JWT - Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('jwt_access', jsonData.access);",
+									"    pm.collectionVariables.set('jwt_refresh', jsonData.refresh);",
+									"    pm.environment.set('jwt_access', jsonData.access);",
+									"    pm.environment.set('jwt_refresh', jsonData.refresh);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/jwt/login/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "jwt", "login", ""]
+						},
+						"description": "Obtener tokens JWT (access y refresh)"
+					},
+					"response": []
+				},
+				{
+					"name": "JWT - Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('jwt_access', jsonData.access);",
+									"    pm.environment.set('jwt_access', jsonData.access);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"{{jwt_refresh}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/jwt/refresh/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "jwt", "refresh", ""]
+						},
+						"description": "Renovar access token usando refresh token"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Airlines",
+			"item": [
+				{
+					"name": "List Airlines",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/airlines/",
+							"host": ["{{base_url}}"],
+							"path": ["airlines", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Airline",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"AVI\",\n    \"name\": \"Avianca\",\n    \"country\": \"Colombia\",\n    \"fleet_size\": 150,\n    \"website\": \"https://www.avianca.com\",\n    \"contact_email\": \"info@avianca.com\",\n    \"contact_phone\": \"+57 1 5951111\",\n    \"headquarters\": \"Bogotá, Colombia\",\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/airlines/",
+							"host": ["{{base_url}}"],
+							"path": ["airlines", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airline Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/airlines/1/",
+							"host": ["{{base_url}}"],
+							"path": ["airlines", "1", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Airline",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"AVI\",\n    \"name\": \"Avianca Airlines\",\n    \"country\": \"Colombia\",\n    \"fleet_size\": 160,\n    \"website\": \"https://www.avianca.com\",\n    \"contact_email\": \"info@avianca.com\",\n    \"contact_phone\": \"+57 1 5951111\",\n    \"headquarters\": \"Bogotá, Colombia\",\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/airlines/1/",
+							"host": ["{{base_url}}"],
+							"path": ["airlines", "1", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Airline",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/airlines/1/",
+							"host": ["{{base_url}}"],
+							"path": ["airlines", "1", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Airlines by Country",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/airlines/by_country/?country=Colombia",
+							"host": ["{{base_url}}"],
+							"path": ["airlines", "by_country", ""],
+							"query": [
+								{
+									"key": "country",
+									"value": "Colombia"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airline Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/airlines/1/flights/",
+							"host": ["{{base_url}}"],
+							"path": ["airlines", "1", "flights", ""]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Airports",
+			"item": [
+				{
+					"name": "List Airports",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/airports/",
+							"host": ["{{base_url}}"],
+							"path": ["airports", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Airport",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"BOG\",\n    \"name\": \"Aeropuerto Internacional El Dorado\",\n    \"city\": \"Bogotá\",\n    \"country\": \"Colombia\",\n    \"latitude\": 4.701594,\n    \"longitude\": -74.146947,\n    \"elevation\": 2548,\n    \"timezone\": \"America/Bogota\",\n    \"terminals\": 2,\n    \"runways\": 2,\n    \"is_international\": true,\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/airports/",
+							"host": ["{{base_url}}"],
+							"path": ["airports", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airport Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/airports/1/",
+							"host": ["{{base_url}}"],
+							"path": ["airports", "1", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Airport",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"terminals\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/airports/1/",
+							"host": ["{{base_url}}"],
+							"path": ["airports", "1", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List International Airports",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/airports/international/",
+							"host": ["{{base_url}}"],
+							"path": ["airports", "international", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airport Departures",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/airports/1/departures/",
+							"host": ["{{base_url}}"],
+							"path": ["airports", "1", "departures", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Airport Arrivals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/airports/1/arrivals/",
+							"host": ["{{base_url}}"],
+							"path": ["airports", "1", "arrivals", ""]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Flights",
+			"item": [
+				{
+					"name": "List Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/flights/",
+							"host": ["{{base_url}}"],
+							"path": ["flights", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Flight",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"flight_number\": \"AV101\",\n    \"airline\": 1,\n    \"origin\": 1,\n    \"destination\": 2,\n    \"departure_time\": \"2024-12-20T08:00:00Z\",\n    \"arrival_time\": \"2024-12-20T09:30:00Z\",\n    \"status\": \"SCHEDULED\",\n    \"total_seats\": 180,\n    \"available_seats\": 180,\n    \"economy_price\": 150000,\n    \"business_price\": 450000,\n    \"first_class_price\": 800000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/flights/",
+							"host": ["{{base_url}}"],
+							"path": ["flights", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/flights/search/?origin=1&destination=2&date=2024-12-20",
+							"host": ["{{base_url}}"],
+							"path": ["flights", "search", ""],
+							"query": [
+								{
+									"key": "origin",
+									"value": "1"
+								},
+								{
+									"key": "destination",
+									"value": "2"
+								},
+								{
+									"key": "date",
+									"value": "2024-12-20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upcoming Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/flights/upcoming/",
+							"host": ["{{base_url}}"],
+							"path": ["flights", "upcoming", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Flight Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"BOARDING\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/flights/1/update_status/",
+							"host": ["{{base_url}}"],
+							"path": ["flights", "1", "update_status", ""]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Passengers",
+			"item": [
+				{
+					"name": "List Passengers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/passengers/",
+							"host": ["{{base_url}}"],
+							"path": ["passengers", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Passenger",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Juan\",\n    \"last_name\": \"Pérez\",\n    \"date_of_birth\": \"1990-05-15\",\n    \"nationality\": \"Colombia\",\n    \"gender\": \"M\",\n    \"document_type\": \"PASSPORT\",\n    \"document_number\": \"AB123456\",\n    \"document_expiry\": \"2030-12-31\",\n    \"email\": \"juan.perez@email.com\",\n    \"phone\": \"+573001234567\",\n    \"address\": \"Calle 123 #45-67\",\n    \"city\": \"Bogotá\",\n    \"country\": \"Colombia\",\n    \"postal_code\": \"110111\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/passengers/",
+							"host": ["{{base_url}}"],
+							"path": ["passengers", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Passenger Bookings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/passengers/1/bookings/",
+							"host": ["{{base_url}}"],
+							"path": ["passengers", "1", "bookings", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Frequent Flyers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/passengers/frequent_flyers/",
+							"host": ["{{base_url}}"],
+							"path": ["passengers", "frequent_flyers", ""]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "List Bookings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/bookings/",
+							"host": ["{{base_url}}"],
+							"path": ["bookings", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Booking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"passenger\": 1,\n    \"flight\": 1,\n    \"travel_class\": \"ECONOMY\",\n    \"seat_number\": \"12A\",\n    \"checked_baggage\": 1,\n    \"carry_on_baggage\": 1,\n    \"special_requests\": \"Asiento junto a ventana\",\n    \"meal_preference\": \"Vegetariano\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/bookings/",
+							"host": ["{{base_url}}"],
+							"path": ["bookings", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Booking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/bookings/1/confirm/",
+							"host": ["{{base_url}}"],
+							"path": ["bookings", "1", "confirm", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Process Payment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 150000,\n    \"payment_method\": \"CREDIT_CARD\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/bookings/1/process_payment/",
+							"host": ["{{base_url}}"],
+							"path": ["bookings", "1", "process_payment", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/bookings/1/",
+							"host": ["{{base_url}}"],
+							"path": ["bookings", "1", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My Bookings",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/bookings/my_bookings/",
+							"host": ["{{base_url}}"],
+							"path": ["bookings", "my_bookings", ""]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Crew",
+			"item": [
+				{
+					"name": "List Crew Members",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/crew/members/",
+							"host": ["{{base_url}}"],
+							"path": ["crew", "members", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Crew Member",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": \"PILOT001\",\n    \"first_name\": \"Carlos\",\n    \"last_name\": \"Rodriguez\",\n    \"date_of_birth\": \"1980-03-20\",\n    \"nationality\": \"Colombia\",\n    \"role\": \"CAPTAIN\",\n    \"license_number\": \"CPL123456\",\n    \"license_expiry\": \"2026-12-31\",\n    \"hire_date\": \"2015-01-15\",\n    \"years_of_experience\": 15,\n    \"flight_hours\": 8500,\n    \"email\": \"carlos.rodriguez@airline.com\",\n    \"phone\": \"+573009876543\",\n    \"emergency_contact\": \"Maria Rodriguez\",\n    \"emergency_phone\": \"+573001112233\",\n    \"languages\": \"Español, Inglés\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/crew/members/",
+							"host": ["{{base_url}}"],
+							"path": ["crew", "members", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Available Crew",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/crew/members/available/?role=CAPTAIN",
+							"host": ["{{base_url}}"],
+							"path": ["crew", "members", "available", ""],
+							"query": [
+								{
+									"key": "role",
+									"value": "CAPTAIN"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crew by Role",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/crew/members/by_role/?role=FLIGHT_ATTENDANT",
+							"host": ["{{base_url}}"],
+							"path": ["crew", "members", "by_role", ""],
+							"query": [
+								{
+									"key": "role",
+									"value": "FLIGHT_ATTENDANT"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Availability",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/crew/members/1/toggle_availability/",
+							"host": ["{{base_url}}"],
+							"path": ["crew", "members", "1", "toggle_availability", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Crew Assignment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"flight\": 1,\n    \"crew_member\": 1,\n    \"notes\": \"Asignación regular\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/crew/assignments/",
+							"host": ["{{base_url}}"],
+							"path": ["crew", "assignments", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Flight Crew Assignments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/crew/assignments/by_flight/?flight_id=1",
+							"host": ["{{base_url}}"],
+							"path": ["crew", "assignments", "by_flight", ""],
+							"query": [
+								{
+									"key": "flight_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Maintenance",
+			"item": [
+				{
+					"name": "List Aircraft",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/maintenance/aircraft/",
+							"host": ["{{base_url}}"],
+							"path": ["maintenance", "aircraft", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Aircraft",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"registration\": \"HK-5050\",\n    \"airline\": 1,\n    \"manufacturer\": \"Airbus\",\n    \"model\": \"A320\",\n    \"year_manufactured\": 2018,\n    \"total_seats\": 180,\n    \"first_class_seats\": 12,\n    \"business_class_seats\": 24,\n    \"economy_class_seats\": 144,\n    \"status\": \"OPERATIONAL\",\n    \"flight_hours\": 5000,\n    \"total_flights\": 2500\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/maintenance/aircraft/",
+							"host": ["{{base_url}}"],
+							"path": ["maintenance", "aircraft", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Operational Aircraft",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/maintenance/aircraft/operational/",
+							"host": ["{{base_url}}"],
+							"path": ["maintenance", "aircraft", "operational", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Aircraft in Maintenance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/maintenance/aircraft/in_maintenance/",
+							"host": ["{{base_url}}"],
+							"path": ["maintenance", "aircraft", "in_maintenance", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Aircraft Maintenance History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/maintenance/aircraft/1/maintenance_history/",
+							"host": ["{{base_url}}"],
+							"path": ["maintenance", "aircraft", "1", "maintenance_history", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Aircraft Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"MAINTENANCE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/maintenance/aircraft/1/update_status/",
+							"host": ["{{base_url}}"],
+							"path": ["maintenance", "aircraft", "1", "update_status", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Maintenance Records",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/maintenance/records/",
+							"host": ["{{base_url}}"],
+							"path": ["maintenance", "records", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Maintenance Record",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"aircraft\": 1,\n    \"maintenance_type\": \"ROUTINE\",\n    \"priority\": \"MEDIUM\",\n    \"status\": \"SCHEDULED\",\n    \"title\": \"Inspección de rutina 5000 horas\",\n    \"description\": \"Inspección general de fuselaje y sistemas\",\n    \"technician\": \"Jorge Méndez\",\n    \"supervisor\": \"Ana García\",\n    \"scheduled_date\": \"2024-12-25\",\n    \"estimated_hours\": 8.5\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/maintenance/records/",
+							"host": ["{{base_url}}"],
+							"path": ["maintenance", "records", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Scheduled Maintenance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/maintenance/records/scheduled/",
+							"host": ["{{base_url}}"],
+							"path": ["maintenance", "records", "scheduled", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start Maintenance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/maintenance/records/1/start_maintenance/",
+							"host": ["{{base_url}}"],
+							"path": ["maintenance", "records", "1", "start_maintenance", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complete Maintenance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_access}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"actual_hours\": 9.0,\n    \"cost\": 3500000,\n    \"findings\": \"Se encontró desgaste menor en tren de aterrizaje\",\n    \"actions_taken\": \"Reemplazo de rodamientos y lubricación general\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/maintenance/records/1/complete_maintenance/",
+							"host": ["{{base_url}}"],
+							"path": ["maintenance", "records", "1", "complete_maintenance", ""]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
