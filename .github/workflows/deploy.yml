@@ -40,8 +40,8 @@ jobs:
       env:
         DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
         SECRET_KEY: test-secret-key
-      run: |
         working-directory: ./django/flights_api
+      run: |
         python manage.py test
 
   deploy:
