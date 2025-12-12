@@ -69,7 +69,6 @@ jobs:
         PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
         VENV_PATH: ${{ secrets.VENV_PATH }}
       run: |
-        # Comandos SSH para desplegar
         ssh $VPS_USER@$VPS_HOST "
           set -e
 
@@ -81,16 +80,23 @@ jobs:
           echo '2. Activando entorno virtual...'
           source $VENV_PATH/bin/activate
 
-          echo '3. Instalando dependencias...'
+          echo '3. Entering Django Project Directory...'
+          # 🚨 THIS IS THE KEY FIX 🚨
+          cd django/flights_api
+
+          echo '4. Instalando dependencias...'
+          # Now requirements.txt is right here
           pip install -r requirements.txt
 
-          echo '4. Aplicando migraciones...'
+          echo '5. Aplicando migraciones...'
+          # Now manage.py is right here
           python manage.py migrate --noinput
 
-          echo '5. Colectando archivos estáticos...'
+          echo '6. Colectando archivos estáticos...'
           python manage.py collectstatic --noinput --clear
 
-          echo '6. Reiniciando servicios...'
+          echo '7. Reiniciando servicios...'
+          # Since you are using root now, these will work without sudo/password
           systemctl restart gunicorn || true
           systemctl restart nginx || true
 
