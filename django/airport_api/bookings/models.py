@@ -89,6 +89,13 @@ class Booking(models.Model):
             models.Index(fields=['status']),
             models.Index(fields=['-booking_date']),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['passenger', 'flight'],
+                condition=models.Q(status__in=['PENDING', 'CONFIRMED', 'PAID']),
+                name='unique_active_booking_per_passenger_flight'
+            )
+        ]
     
     def __str__(self):
         return f"{self.booking_code} - {self.passenger.full_name}"
@@ -118,3 +125,18 @@ class Booking(models.Model):
     @property
     def is_active(self):
         return self.status in ['PENDING', 'CONFIRMED', 'PAID']
+    
+    @property
+    def total_amount(self):
+        """Calcula el monto total basado en el precio del vuelo y la clase"""
+        from decimal import Decimal
+        base = self.flight.base_price
+        # Multiplicadores por clase
+        multipliers = {
+            'ECONOMY': Decimal('1.0'),
+            'PREMIUM_ECONOMY': Decimal('1.5'),
+            'BUSINESS': Decimal('2.5'),
+            'FIRST_CLASS': Decimal('4.0'),
+        }
+        multiplier = multipliers.get(self.travel_class, Decimal('1.0'))
+        return base * multiplier

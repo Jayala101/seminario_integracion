@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
 from datetime import timedelta
+from passengers.permissions import IsAdminOrReadOnly
 from .models import Flight
 from .serializers import FlightSerializer
 
@@ -14,7 +15,7 @@ class FlightViewSet(viewsets.ModelViewSet):
         'airline', 'origin_airport', 'destination_airport'
     ).all()
     serializer_class = FlightSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = [
         'airline', 'origin_airport', 'destination_airport',
@@ -25,7 +26,7 @@ class FlightViewSet(viewsets.ModelViewSet):
     ordering = ['-departure_time']
     
     def get_permissions(self):
-        if self.action == 'destroy':
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsAdminUser()]
         return super().get_permissions()
     

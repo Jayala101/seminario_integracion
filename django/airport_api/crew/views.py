@@ -1,7 +1,7 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import CrewMember, FlightCrewAssignment
 from .serializers import CrewMemberSerializer, FlightCrewAssignmentSerializer
@@ -18,9 +18,24 @@ class CrewMemberViewSet(viewsets.ModelViewSet):
     ordering = ['last_name', 'first_name']
     
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [IsAuthenticated()]
+        if self.action == 'register':
+            return [AllowAny()]
+        if self.action == 'create':
             return [IsAuthenticated()]
         return super().get_permissions()
+    
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def register(self, request):
+        """
+        Endpoint público para registro de nuevos tripulantes
+        """
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=False, methods=['get'])
     def available(self, request):
@@ -84,6 +99,59 @@ class FlightCrewAssignmentViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsAuthenticated()]
         return super().get_permissions()
+    
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_assignments(self, request):
+        """
+        Retorna las asignaciones de vuelo del crew member autenticado
+        """
+        try:
+            # Buscar el crew member asociado al usuario autenticado por email
+            crew_member = CrewMember.objects.get(email=request.user.email)
+            
+            # Obtener asignaciones del crew member con detalles del vuelo
+            assignments = self.queryset.filter(crew_member=crew_member).select_related(
+                'flight__origin_airport',
+                'flight__destination_airport',
+                'flight__airline'
+            )
+            
+            # Serializar con detalles adicionales del vuelo
+            data = []
+            for assignment in assignments:
+                flight = assignment.flight
+                data.append({
+                    'id': assignment.id,
+                    'flight': flight.id,
+                    'flight_number': flight.flight_number,
+                    'crew_member': crew_member.id,
+                    'crew_member_name': crew_member.full_name,
+                    'crew_member_role': crew_member.get_role_display(),
+                    'assigned_at': assignment.assigned_at,
+                    'notes': assignment.notes,
+                    'flight_details': {
+                        'flight_number': flight.flight_number,
+                        'origin_airport_name': flight.origin_airport.name if flight.origin_airport else 'N/A',
+                        'destination_airport_name': flight.destination_airport.name if flight.destination_airport else 'N/A',
+                        'departure_time': flight.departure_time,
+                        'arrival_time': flight.arrival_time,
+                        'status': flight.status,
+                        'aircraft_type': flight.aircraft_type,
+                        'gate': flight.gate,
+                    }
+                })
+            
+            return Response(data)
+        except CrewMember.DoesNotExist:
+            return Response(
+                {'error': 'No se encontró un miembro de tripulación asociado a este usuario'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     @action(detail=False, methods=['get'])
     def by_flight(self, request):

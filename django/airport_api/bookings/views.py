@@ -11,12 +11,28 @@ from .serializers import BookingSerializer, BookingCreateSerializer
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.select_related('passenger', 'flight', 'flight__airline').all()
     serializer_class = BookingSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'travel_class', 'flight', 'passenger']
     search_fields = ['booking_code', 'passenger__first_name', 'passenger__last_name']
     ordering_fields = ['booking_date', 'amount_paid', 'created_at']
     ordering = ['-booking_date']
+    
+    def get_queryset(self):
+        """Filtrar reservas: admin ve todas, usuarios solo las suyas"""
+        queryset = super().get_queryset()
+        user = self.request.user
+        
+        # Si es admin, ver todas las reservas
+        if hasattr(user, 'profile') and user.profile.is_admin:
+            return queryset
+        
+        # Si no es admin, solo ver sus propias reservas
+        if hasattr(user, 'passenger_profile'):
+            return queryset.filter(passenger=user.passenger_profile)
+        
+        # Si el usuario no tiene perfil de pasajero, no mostrar nada
+        return queryset.none()
     
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -49,7 +65,17 @@ class BookingViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            user = request.user
             
+            # Si el usuario es admin, permite eliminar en cualquier estado
+            if hasattr(user, 'profile') and user.profile.is_admin:
+                instance.delete()
+                return Response(
+                    {'message': 'Reserva eliminada exitosamente'},
+                    status=status.HTTP_204_NO_CONTENT
+                )
+            
+            # Para usuarios regulares, solo cancelar (no eliminar)
             if instance.status == 'CANCELLED':
                 return Response(
                     {'error': 'La reserva ya está cancelada'},
@@ -62,7 +88,7 @@ class BookingViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            record.status = 'CANCELLED'
+            instance.status = 'CANCELLED'
             instance.cancelled_at = timezone.now()
             instance.save()
             
@@ -72,7 +98,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             )
         except Exception as e:
             return Response(
-                {'error': f'Error al cancelar: {str(e)}'},
+                {'error': f'Error al cancelar/eliminar: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     

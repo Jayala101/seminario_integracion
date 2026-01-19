@@ -1,6 +1,76 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+class UserProfile(models.Model):
+    """Modelo de perfil de usuario con roles"""
+    ROLE_CHOICES = [
+        ('ADMIN', 'Administrador'),
+        ('STAFF', 'Personal'),
+        ('CUSTOMER', 'Cliente'),
+    ]
+    
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='profile'
+    )
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default='CUSTOMER'
+    )
+    phone = models.CharField(max_length=20, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Perfil de Usuario'
+        verbose_name_plural = 'Perfiles de Usuario'
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.get_role_display()}"
+    
+    @property
+    def is_admin(self):
+        return self.role == 'ADMIN' or self.user.is_superuser
+    
+    @property
+    def is_staff_member(self):
+        return self.role in ['ADMIN', 'STAFF'] or self.user.is_staff
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    """Crea automáticamente un perfil cuando se crea un usuario"""
+    if created:
+        # Si es superusuario, crear perfil de admin
+        role = 'ADMIN' if instance.is_superuser else 'CUSTOMER'
+        UserProfile.objects.create(user=instance, role=role)
+        
+        # Crear automáticamente un pasajero para el usuario si no existe
+        if not hasattr(instance, 'passenger_profile'):
+            Passenger.objects.create(
+                user=instance,
+                first_name=instance.first_name or instance.username,
+                last_name=instance.last_name or '',
+                date_of_birth='2000-01-01',  # Fecha por defecto, se puede actualizar después
+                nationality='México',
+                document_type='ID_CARD',
+                document_number=f'USR{instance.id:08d}',
+                email=instance.email or f'{instance.username}@example.com',
+                phone='+5200000000000',
+            )
+
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    """Guarda el perfil cuando se guarda el usuario"""
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
 
 
 class Passenger(models.Model):

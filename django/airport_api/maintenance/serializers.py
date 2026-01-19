@@ -65,7 +65,7 @@ class MaintenanceRecordSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['created_at', 'updated_at']
     
-    def get_duration(self, obj):
+    def get_duration_days(self, obj):
         if obj.start_date and obj.completion_date:
             return (obj.completion_date - obj.start_date).days
         return None
