@@ -2,38 +2,38 @@ import { useRef } from "react";
 import { useState } from "react";
 
 export function UseRefAreaTrapecio() {
+    const baseMayorRef = useRef<HTMLInputElement | null>(null);
+    const baseMenorRef = useRef<HTMLInputElement | null>(null);
+    const alturaRef = useRef<HTMLInputElement | null>(null);
 
-    const baseRef = useRef<HTMLInputElement | null>(null);
-    const basemayorRef = useRef<HTMLInputElement | null>(null);
-    const heightRef = useRef<HTMLInputElement | null>(null);
-    const[area,setArea] = useState(0);
-    const calculateArea=()=>{
-        const base = Number(baseRef.current?.value || 0);
-        const basemayor = Number(baseRef.current?.value || 0);
-        const height = Number(heightRef.current?.value || 0);
-        setArea(((base+basemayor)*height)/2)
+    const [area, setArea] = useState(0);
+
+    const calcular=()=>{
+        const baseMayor = Number(baseMayorRef.current?.value || 0);
+        const baseMenor = Number(baseMenorRef.current?.value || 0);
+        const altura = Number(alturaRef.current?.value|| 0);
+        setArea(((baseMayor + baseMenor) / 2) * altura);
     }
 
-    return(
-        <>
-            <input
-                ref = {baseRef}
-                type = "number"
-                placeholder="Base menor"
-            />
-            <input
-                ref = {basemayorRef}
-                type = "number"
-                placeholder="Base mayor"
-            />
-            <input
-                ref = {heightRef}
-                type = "number"
-                placeholder="Altura"
-            />
-            <button onClick={calculateArea}> Calcular area</button>
-            <p>Area: {area}</p>
-        </>
-    )
-
+    return (
+    <>
+      <input
+        ref={baseMayorRef}
+        type="number"
+        placeholder="Base mayor"
+      />
+      <input
+        ref={baseMenorRef}
+        type="number"
+        placeholder="Base menor"
+      />
+      <input
+        ref={alturaRef}
+        type="number"
+        placeholder="Altura"
+      />
+      <button onClick={calcular}>Calcular área</button>
+      <p>Area: {area}</p>
+    </>
+    );
 }
